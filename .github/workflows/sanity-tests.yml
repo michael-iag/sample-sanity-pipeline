@@ -564,3 +564,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           force_orphan: true
+          
+      # Add this step to trigger the stats workflow
+      - name: Trigger stats workflow update
+        if: success() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: |
+          # Use GitHub CLI to trigger workflow_dispatch event on the stats repo
+          gh workflow run update-stats.yml --repo ${{ github.repository_owner }}/sanity-test-hub
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_HUB_TRIGGER_PAT }}
