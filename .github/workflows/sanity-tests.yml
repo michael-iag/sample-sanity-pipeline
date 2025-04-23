@@ -298,6 +298,9 @@ jobs:
           # Copy metrics.json to the public directory
           cp metrics.json public/
           
+          # Get the repository owner for the dynamic back button
+          REPO_OWNER="${{ github.repository_owner }}"
+          
           # Create a self-contained dashboard HTML file
           cat > public/index.html << EOF
           <!DOCTYPE html>
@@ -355,7 +358,7 @@ jobs:
           </head>
           <body>
             <div class="back-button" id="backButton">
-              <a href="https://mik3ola.github.io/sanity-test-hub/"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+              <a href="https://${REPO_OWNER}.github.io/sanity-test-hub/" id="backLink"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
             </div>
             
             <script>
@@ -387,7 +390,7 @@ jobs:
                   const match = currentUrl.match(/https:\/\/(.*?)\.github\.io/);
                   if (match && match[1]) {
                     const orgName = match[1];
-                    hubUrl = `https://${orgName}.github.io/sanity-test-hub/`;
+                    hubUrl = \`https://\${orgName}.github.io/sanity-test-hub/\`;
                   }
                 }
                 
@@ -554,6 +557,27 @@ jobs:
           echo "Public directory content:"
           ls -la public/
           
+      - name: Extract and prepare Allure reports for GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          # Create directory for Allure reports
+          mkdir -p public/allure-report
+          
+          # Unzip the Allure results
+          unzip -q allure-results.zip -d temp-allure-results
+          
+          # Generate Allure report (if allure command is available)
+          if command -v allure >/dev/null 2>&1; then
+            allure generate temp-allure-results/allure-results -o public/allure-report --clean
+            echo "Generated Allure report in public/allure-report"
+            
+            # Create a link to Allure reports in the index.html
+            sed -i 's|</body>|<p><a href="allure-report/index.html">View detailed Allure test reports</a></p></body>|' public/index.html
+          else
+            echo "Allure command not found - copying raw results instead"
+            cp -r temp-allure-results/allure-results public/
+          fi
+          
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
@@ -561,3 +585,17 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           force_orphan: true
+          
+      # Add a step to check what's being deployed
+      - name: Verify GitHub Pages content
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          echo "Files being deployed to GitHub Pages:"
+          find public -type f | sort
+          
+          # Ensure index.html exists and is the primary file
+          if [ -f "public/index.html" ]; then
+            echo "✅ index.html exists and will be the default page"
+          else
+            echo "⚠️ index.html is missing - check what file will be served as the default page"
+          fi
