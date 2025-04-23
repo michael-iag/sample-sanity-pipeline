@@ -278,7 +278,7 @@ jobs:
           path: metrics.json
           
       - name: Create self-contained dashboard
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
           # Read metrics from the metrics.json file
           METRICS_JSON=$(cat metrics.json)
@@ -558,7 +558,7 @@ jobs:
           ls -la public/
           
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
