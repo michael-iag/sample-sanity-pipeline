@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-05-02T10:59:47Z",
+  "total_tests": 3,
+  "passed_tests": 1,
+  "failed_tests": 2,
+  "pass_rate": 33.33,
+  "duration_seconds": 0,
+  "critical_tests_count": 1,
+  "run_id": "14793910365",
+  "repository": "michael-iag/sample-sanity-pipeline",
+  "branch": "refs/heads/main"
+}
