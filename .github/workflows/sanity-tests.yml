@@ -25,7 +25,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # Install jq for JSON processing
           sudo apt-get install -y jq
-      - name: Configure Datadog Test Optimization
+      - name: Configure Datadog Test Optimisation
         uses: datadog/test-visibility-github-action@v2
         with:
           languages: python
@@ -363,7 +363,7 @@ jobs:
           </head>
           <body>
             <div class="back-button" id="backButton">
-              <a href="https://${REPO_OWNER}.github.io/sanity-test-hub/" id="backLink"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+              <a href="https://${REPO_OWNER}.github.io/sanity-test-hub/" id="backLink"><i class="fas fa-arrow-left"></i> Back to Hub</a>
             </div>
             
             <script>
@@ -390,7 +390,7 @@ jobs:
                 
                 // Method 3: Fallback to a pattern based on current URL
                 if (!hubUrl) {
-                  // Extract organization name from current URL
+                  // Extract organisation name from current URL
                   const currentUrl = window.location.href;
                   const match = currentUrl.match(/https:\/\/(.*?)\.github\.io/);
                   if (match && match[1]) {
